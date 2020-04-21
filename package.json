@@ -8,7 +8,8 @@
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev src/index.ts",
     "build": "tsc",
-    "run-build": "tsc && node build/index.js"
+    "run-build": "tsc && node build/index.js",
+    "precommit": "npm ci && tsc"
   },
   "repository": "github:n3wsw3/UrbanDick",
   "dependencies": {
