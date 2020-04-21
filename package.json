@@ -10,10 +10,7 @@
     "build": "tsc",
     "run-build": "tsc && node build/index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "github:n3wsw3/UrbanDick"
-  },
+  "repository": "github:n3wsw3/UrbanDick",
   "dependencies": {
     "@typeit/discord": "^2.0.9",
     "@types/node": "^13.11.1",
