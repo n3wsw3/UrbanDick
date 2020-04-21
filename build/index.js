@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
-const logger_1 = require("./logger");
+const UrbanDick_1 = require("./UrbanDick");
 require("dotenv").config();
-require("./UrbanDick").run(process.env.TOKEN, logger_1.DebugLevel.Debug);
+require("./UrbanDick").run(process.env.TOKEN, UrbanDick_1.DebugLevel.Debug);

@@ -6,6 +6,7 @@ const discord_js_1 = require("discord.js");
 const urbanAPI_1 = require("./urbanAPI");
 const MessageConstructor = require("./MessageConstructor");
 const logger_1 = require("./logger");
+exports.DebugLevel = logger_1.DebugLevel;
 let UrbanDick = class UrbanDick {
     static start(token, debugLevel = logger_1.DebugLevel.Warn) {
         this._client = new discord_1.Client();
