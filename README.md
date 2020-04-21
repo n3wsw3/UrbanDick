@@ -15,7 +15,7 @@ npm i urban-dick-bot
 Simple
 
 ```javascript
-require("urban-dick-bot").run("<YOUR-DISCORD-TOKEN>);
+require("urban-dick-bot").run("<YOUR-DISCORD-TOKEN>");
 ```
 
 With Custom Debug Level
