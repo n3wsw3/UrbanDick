@@ -1,6 +1,6 @@
 {
   "name": "urban-dick-bot",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A simple Discord bot that responds with the Urban Dictionary definition",
   "main": "build/UrbanDick.js",
   "author": "Simon Uggla (simon.uggla@aol.com)",
