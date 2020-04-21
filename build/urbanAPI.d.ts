@@ -18,3 +18,9 @@ export declare function GetTermString(termstring: string): string;
 export declare function GetDefinition(termstring: string): Promise<UrbanDicResult>;
 export declare function GetLink(termstring: string): string;
 export declare function GetRandomDefinition(): Promise<UrbanDicResult>;
+/**
+ * Used to escape unicode characters, such as emojies.
+ * Otherwise get requests will fail
+ * @param str
+ */
+export declare function unicodeEscape(str: string): any;
