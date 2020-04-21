@@ -1,6 +1,6 @@
 {
   "name": "urban-dick-bot",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A simple Discord bot that responds with the Urban Dictionary definition",
   "main": "build/UrbanDick.js",
   "author": "Simon Uggla (simon.uggla@aol.com)",
@@ -9,6 +9,10 @@
     "dev": "ts-node-dev src/index.ts",
     "build": "tsc",
     "run-build": "tsc && node build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github:n3wsw3/UrbanDick"
   },
   "dependencies": {
     "@typeit/discord": "^2.0.9",
