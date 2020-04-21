@@ -65,6 +65,6 @@ export function GetRandomDefinition() {
  */
 export function unicodeEscape(str: string) {
   let temp = encodeUrl(str);
-  console.log(temp);
+  // console.log(temp);
   return temp;
 }
