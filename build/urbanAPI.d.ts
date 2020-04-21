@@ -15,12 +15,12 @@ export interface UrbanDicPost {
     thumbs_down: number;
 }
 export declare function GetTermString(termstring: string): string;
-export declare function GetDefinition(termstring: string): Promise<UrbanDicResult>;
+export declare function GetDefinition(termstring: string): Promise<unknown>;
 export declare function GetLink(termstring: string): string;
-export declare function GetRandomDefinition(): Promise<UrbanDicResult>;
+export declare function GetRandomDefinition(): Promise<unknown>;
 /**
  * Used to escape unicode characters, such as emojies.
  * Otherwise get requests will fail
  * @param str
  */
-export declare function unicodeEscape(str: string): any;
+export declare function unicodeEscape(str: string): string;

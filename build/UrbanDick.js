@@ -5,46 +5,75 @@ const discord_1 = require("@typeit/discord");
 const discord_js_1 = require("discord.js");
 const urbanAPI_1 = require("./urbanAPI");
 const MessageConstructor = require("./MessageConstructor");
+const logger_1 = require("./logger");
 let UrbanDick = class UrbanDick {
-    static start(token) {
+    static start(token, debugLevel = logger_1.DebugLevel.Warn) {
         this._client = new discord_1.Client();
         this._client.login(token);
+        logger_1.Logger.Get().SetLogLevel(debugLevel);
     }
     onDefine(message, client) {
+        logger_1.Logger.Get().Trace("OnDefine");
         let paramString = message.params.join(" ");
-        // console.log(`${message.author.username}: ${paramString}`);
-        urbanAPI_1.GetDefinition(paramString).then((data) => {
+        logger_1.Logger.Get().Debug(`${message.author.username} requested '${paramString}' in ${message.channel.type == "text"
+            ? "channel " + message.channel.name
+            : "DMs"}`);
+        urbanAPI_1.GetDefinition(paramString)
+            .then((data) => {
             // Ensure there is a definition for the word
             // If the list is empty there are no definitions.
             if (data.list.length) {
                 let embed = MessageConstructor.CreateEmbedded(data.list[0]);
-                message.channel.send({ embed });
+                sendToChannel(message, { embed });
             }
             else {
                 // There is no definition for the word(s)
                 let embed = new discord_js_1.MessageEmbed().setTitle(`There is no definition for ${paramString}`);
-                message.channel.send({ embed });
+                sendToChannel(message, { embed });
             }
+        })
+            .catch((err) => {
+            sendToChannel(message, "Error connecting to Urban Dictionary");
         });
     }
     onRoder(message, client) {
-        urbanAPI_1.GetDefinition("roder").then((data) => {
+        logger_1.Logger.Get().Trace("OnRoder");
+        logger_1.Logger.Get().Debug(`${message.author.username} requested 'roder' in ${message.channel.type == "text"
+            ? "channel " + message.channel.name
+            : "DMs"}`);
+        urbanAPI_1.GetDefinition("roder")
+            .then((data) => {
             let embed = MessageConstructor.CreateEmbedded(data.list[0]);
-            message.channel.send({ embed });
+            sendToChannel(message, { embed });
+        })
+            .catch((err) => {
+            sendToChannel(message, err.message);
         });
     }
     onRandom(message, client) {
-        urbanAPI_1.GetRandomDefinition().then((data) => {
+        logger_1.Logger.Get().Trace("OnRandom");
+        logger_1.Logger.Get().Debug(`${message.author.username} requested a random definition in ${message.channel.type == "text"
+            ? "channel " + message.channel.name
+            : "DMs"}`);
+        urbanAPI_1.GetRandomDefinition()
+            .then((data) => {
             // There should always be something in the list property.
             // But uncaught errors are not fun
             // If it didn't return anything, fuck it. The user doesn't need this anyways.
             if (data.list.length) {
                 let embed = MessageConstructor.CreateEmbedded(data.list[0]);
-                message.channel.send({ embed });
+                sendToChannel(message, { embed });
             }
+        })
+            .catch((err) => {
+            sendToChannel(message, "Error connecting to Urban Dictionary");
         });
     }
     onHelp(message, client) {
+        logger_1.Logger.Get().Trace("OnHelp");
+        logger_1.Logger.Get().Debug(`${message.author.username} requested 'help' in ${message.channel.type == "text"
+            ? "channel " + message.channel.name
+            : "DMs"}`);
         let commands = discord_1.Client.getCommands();
         let embed = new discord_js_1.MessageEmbed()
             .setColor(6855505)
@@ -54,7 +83,7 @@ let UrbanDick = class UrbanDick {
             embed.addField(`__**${command.commandName}**__`, `${command.description} 
          **Usage:** ${command.infos.usage}`);
         }
-        message.channel.send({ embed });
+        sendToChannel(message, { embed });
     }
 };
 tslib_1.__decorate([
@@ -104,7 +133,17 @@ tslib_1.__decorate([
 UrbanDick = tslib_1.__decorate([
     discord_1.Discord({ prefix: "!" })
 ], UrbanDick);
-function run(token) {
-    UrbanDick.start(token);
+function run(token, debugLevel) {
+    UrbanDick.start(token, debugLevel);
 }
 exports.run = run;
+function sendToChannel(message, sendee) {
+    message.channel
+        .send(sendee)
+        .then((resp) => {
+        logger_1.Logger.Get().Trace("Message Sent Successfully");
+    })
+        .catch((err) => {
+        logger_1.Logger.Get().Error("Message Failed To Send", err);
+    });
+}

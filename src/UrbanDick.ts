@@ -1,7 +1,9 @@
 import { Discord, Command, CommandMessage, Client } from "@typeit/discord";
-import { MessageEmbed } from "discord.js";
-import { GetDefinition, GetRandomDefinition } from "./urbanAPI";
+import { MessageEmbed, TextChannel } from "discord.js";
+import { GetDefinition, GetRandomDefinition, UrbanDicResult } from "./urbanAPI";
 import * as MessageConstructor from "./MessageConstructor";
+import { DebugLevel, Logger } from "./logger";
+import { AxiosError } from "axios";
 
 interface Infos {
   usage: string;
@@ -11,9 +13,11 @@ interface Infos {
 abstract class UrbanDick {
   private static _client: Client;
 
-  static start(token: string) {
+  static start(token: string, debugLevel: DebugLevel = DebugLevel.Warn) {
     this._client = new Client();
     this._client.login(token);
+
+    Logger.Get().SetLogLevel(debugLevel);
   }
 
   @Command("define", {
@@ -23,22 +27,34 @@ abstract class UrbanDick {
     },
   })
   private onDefine(message: CommandMessage, client: Client) {
+    Logger.Get().Trace("OnDefine");
+
     let paramString = message.params.join(" ");
-    // console.log(`${message.author.username}: ${paramString}`);
-    GetDefinition(paramString).then((data) => {
-      // Ensure there is a definition for the word
-      // If the list is empty there are no definitions.
-      if (data.list.length) {
-        let embed = MessageConstructor.CreateEmbedded(data.list[0]);
-        message.channel.send({ embed });
-      } else {
-        // There is no definition for the word(s)
-        let embed: MessageEmbed = new MessageEmbed().setTitle(
-          `There is no definition for ${paramString}`
-        );
-        message.channel.send({ embed });
-      }
-    });
+    Logger.Get().Debug(
+      `${message.author.username} requested '${paramString}' in ${
+        message.channel.type == "text"
+          ? "channel " + (message.channel as TextChannel).name
+          : "DMs"
+      }`
+    );
+    GetDefinition(paramString)
+      .then((data: UrbanDicResult) => {
+        // Ensure there is a definition for the word
+        // If the list is empty there are no definitions.
+        if (data.list.length) {
+          let embed = MessageConstructor.CreateEmbedded(data.list[0]);
+          sendToChannel(message, { embed });
+        } else {
+          // There is no definition for the word(s)
+          let embed: MessageEmbed = new MessageEmbed().setTitle(
+            `There is no definition for ${paramString}`
+          );
+          sendToChannel(message, { embed });
+        }
+      })
+      .catch((err: AxiosError) => {
+        sendToChannel(message, "Error connecting to Urban Dictionary");
+      });
   }
   @Command("roder", {
     description:
@@ -48,10 +64,22 @@ abstract class UrbanDick {
     },
   })
   private onRoder(message: CommandMessage, client: Client) {
-    GetDefinition("roder").then((data) => {
-      let embed = MessageConstructor.CreateEmbedded(data.list[0]);
-      message.channel.send({ embed });
-    });
+    Logger.Get().Trace("OnRoder");
+    Logger.Get().Debug(
+      `${message.author.username} requested 'roder' in ${
+        message.channel.type == "text"
+          ? "channel " + (message.channel as TextChannel).name
+          : "DMs"
+      }`
+    );
+    GetDefinition("roder")
+      .then((data: UrbanDicResult) => {
+        let embed = MessageConstructor.CreateEmbedded(data.list[0]);
+        sendToChannel(message, { embed });
+      })
+      .catch((err: AxiosError) => {
+        sendToChannel(message, err.message);
+      });
   }
 
   @Command("random", {
@@ -61,15 +89,27 @@ abstract class UrbanDick {
     },
   })
   private onRandom(message: CommandMessage, client: Client) {
-    GetRandomDefinition().then((data) => {
-      // There should always be something in the list property.
-      // But uncaught errors are not fun
-      // If it didn't return anything, fuck it. The user doesn't need this anyways.
-      if (data.list.length) {
-        let embed = MessageConstructor.CreateEmbedded(data.list[0]);
-        message.channel.send({ embed });
-      }
-    });
+    Logger.Get().Trace("OnRandom");
+    Logger.Get().Debug(
+      `${message.author.username} requested a random definition in ${
+        message.channel.type == "text"
+          ? "channel " + (message.channel as TextChannel).name
+          : "DMs"
+      }`
+    );
+    GetRandomDefinition()
+      .then((data: UrbanDicResult) => {
+        // There should always be something in the list property.
+        // But uncaught errors are not fun
+        // If it didn't return anything, fuck it. The user doesn't need this anyways.
+        if (data.list.length) {
+          let embed = MessageConstructor.CreateEmbedded(data.list[0]);
+          sendToChannel(message, { embed });
+        }
+      })
+      .catch((err: AxiosError) => {
+        sendToChannel(message, "Error connecting to Urban Dictionary");
+      });
   }
 
   @Command("help", {
@@ -79,6 +119,14 @@ abstract class UrbanDick {
     },
   })
   private onHelp(message: CommandMessage, client: Client) {
+    Logger.Get().Trace("OnHelp");
+    Logger.Get().Debug(
+      `${message.author.username} requested 'help' in ${
+        message.channel.type == "text"
+          ? "channel " + (message.channel as TextChannel).name
+          : "DMs"
+      }`
+    );
     let commands = Client.getCommands<Infos>();
     let embed = new MessageEmbed()
       .setColor(6855505)
@@ -91,10 +139,23 @@ abstract class UrbanDick {
          **Usage:** ${command.infos.usage}`
       );
     }
-    message.channel.send({ embed });
+    sendToChannel(message, { embed });
   }
 }
 
-export function run(token: string): void {
-  UrbanDick.start(token);
+export function run(token: string, debugLevel: DebugLevel): void {
+  UrbanDick.start(token, debugLevel);
 }
+
+function sendToChannel(message: CommandMessage, sendee: Object | string) {
+  message.channel
+    .send(sendee)
+    .then((resp) => {
+      Logger.Get().Trace("Message Sent Successfully");
+    })
+    .catch((err) => {
+      Logger.Get().Error("Message Failed To Send", err);
+    });
+}
+
+export { DebugLevel };
