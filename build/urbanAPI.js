@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = require("axios");
-const encodeurl_1 = require("encodeurl");
+const encodeUrl = require("encodeurl");
 function GetTermString(termstring) {
     return termstring.split(" ").join("+");
 }
@@ -37,11 +37,8 @@ exports.GetRandomDefinition = GetRandomDefinition;
  * @param str
  */
 function unicodeEscape(str) {
-    // let temp = str.replace(/[\s\S]/g, function (escape) {
-    //   return "\\u" + ("0000" + escape.charCodeAt(0).toString(16)).slice(-4);
-    // });
-    let temp = encodeurl_1.default(str);
-    console.log(temp);
+    let temp = encodeUrl(str);
+    // console.log(temp);
     return temp;
 }
 exports.unicodeEscape = unicodeEscape;
