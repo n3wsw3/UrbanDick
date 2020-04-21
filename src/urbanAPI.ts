@@ -26,7 +26,9 @@ export function GetDefinition(termstring: string) {
   let terms: string = GetTermString(termstring);
 
   return axios
-    .get(`http://api.urbandictionary.com/v0/define?term=${terms}`)
+    .get(
+      `http://api.urbandictionary.com/v0/define?term=${unicodeEscape(terms)}`
+    )
     .then((resp) => {
       let data: UrbanDicResult = resp.data;
       return data;
@@ -36,7 +38,9 @@ export function GetDefinition(termstring: string) {
 export function GetLink(termstring: string) {
   let terms: string = GetTermString(termstring);
 
-  return `https://www.urbandictionary.com/define.php?term=${terms}`;
+  return `https://www.urbandictionary.com/define.php?term=${unicodeEscape(
+    terms
+  )}`;
 }
 
 export function GetRandomDefinition() {
@@ -51,4 +55,15 @@ export function GetRandomDefinition() {
       let data: UrbanDicResult = resp.data;
       return data;
     });
+}
+
+/**
+ * Used to escape unicode characters, such as emojies.
+ * Otherwise get requests will fail
+ * @param str
+ */
+export function unicodeEscape(str: string) {
+  return str.replace(/[\s\S]/g, function (escape) {
+    return "\\u" + ("0000" + escape.charCodeAt(0).toString(16)).slice(-4);
+  });
 }
