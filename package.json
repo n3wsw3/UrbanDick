@@ -15,7 +15,7 @@
   "dependencies": {
     "@typeit/discord": "^2.0.9",
     "@types/node": "^13.11.1",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
     "discord.js": "^12.1.1",
     "dotenv": "^8.2.0",
